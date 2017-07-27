@@ -8,13 +8,13 @@ import numpy as np
 
 
 #hacky subclass of Optimizer just so I can use make_slot...
-#not sure if it's even that helpful over a plain dict of vars...
+#not sure if this is even that helpful over a plain dict of vars.
 class SVRG(Optimizer):
     '''SVRG
     implements stochastic variance reduced gradient descent
     sgd_optimizer: optimizer to use for SGD phase of SVRG
-    loss_fnc: function that takes as arguments a (list of) variables and outputs
-        a tensor containing the loss.
+    loss_fnc: function that takes as arguments a list of variables (representing the weights
+    of a network) and outputs a tensor containing the loss on an example (or a minibatch).
     '''
 
     GATE_NONE = 0
@@ -99,9 +99,16 @@ class SVRG(Optimizer):
 
 
     def set_var_list(self, var_list):
+        if not hasattr(var_list, '__iter__'):
+            var_list = [var_list]
         self.var_list = var_list
 
-    def recompute_batch(self, batch_loss, var_list=None):
+    def recompute_batch(self, batch_loss_func, var_list=None):
+        '''
+        batch_loss_func: a function that takes a list of parameter variables
+        (representing the weights of a network) and outputs a loss on a large 
+        batch of examples.
+        '''
         self.computed_batch = True
         if var_list is None:
             var_list = self.var_list
@@ -110,6 +117,8 @@ class SVRG(Optimizer):
             batch_gradients_and_vars = [var_list]
 
         self._create_slots(var_list)
+
+        batch_loss = batch_loss_func(var_list)
 
         batch_gradients_and_vars = tf.gradients(batch_loss, var_list)
 
