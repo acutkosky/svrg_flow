@@ -8,6 +8,9 @@ loss_func = lambda v: tf.nn.l2_loss(v[0] - 10.0)
 
 my_favorite_sgd = tf.train.GradientDescentOptimizer(0.1)
 svrg = SVRG(my_favorite_sgd, loss_func)
+
+svrg.set_var_list([w]) # NOTE SVRG CURRENTLY REQUIRES THIS EXPLICIT SPECIFICATION OF VARS TO OPTIMIZE
+
 batch_op = svrg.recompute_batch(loss_func([w]))
 min_op = svrg.minimize()
 

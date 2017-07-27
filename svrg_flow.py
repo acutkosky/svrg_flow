@@ -15,6 +15,9 @@ class SVRG(Optimizer):
     sgd_optimizer: optimizer to use for SGD phase of SVRG
     loss_fnc: function that takes as arguments a list of variables (representing the weights
     of a network) and outputs a tensor containing the loss on an example (or a minibatch).
+
+    note that you MUST call SVRG.set_var_list to specify the variables being optimized
+    before you run any optimization.
     '''
 
     GATE_NONE = 0
